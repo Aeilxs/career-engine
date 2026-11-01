@@ -1,0 +1,32 @@
+name: CI
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.10.0"
+      - name: Assert lock committed
+        run: test -s uv.lock
+      - name: Install locked runtime
+        run: uv sync --frozen --python 3.14
+      - name: Lint
+        run: uv run --frozen ruff check .
+      - name: Format
+        run: uv run --frozen ruff format --check .
+      - name: Typecheck
+        run: uv run --frozen mypy src
+      - name: Tests (no network)
+        run: uv run --frozen pytest -q
+      - name: Compose config
+        run: docker compose config -q
+      - name: Runtime contract
+        run: python scripts/check-runtime-contract.py
+      - name: Docker image build
+        run: docker compose build

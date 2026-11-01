@@ -1,0 +1,9 @@
+Title: Business Manager — Industrial Energy
+Company: Example Industrial Solutions (synthetic)
+Location: Marseille, France
+Contract: Permanent
+Salary: Not disclosed
+Source ID: synthetic/board/offer-001
+Description:
+Manage technical client relationships, qualify industrial projects, coordinate engineering consultants, and report account performance. Knowledge of energy systems is beneficial.
+Application URL: https://example.org/jobs/offer-001

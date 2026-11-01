@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Career Engine · J0</title>
+  <style>
+    :root{color-scheme:dark;font-family:system-ui,-apple-system,sans-serif;background:#1e1e2e;color:#cdd6f4}
+    body{margin:0;display:grid;min-height:100vh;place-items:center;padding:18px;box-sizing:border-box}
+    main{width:min(570px,100%);background:#313244;border:1px solid #45475a;border-radius:18px;padding:30px}
+    h1{margin:0 0 8px;color:#b4befe}p{color:#bac2de;line-height:1.5}
+    code{color:#a6e3a1}#state{border-top:1px solid #585b70;margin-top:22px;padding-top:18px}
+    .note{font-size:13px;color:#a6adc8}
+  </style>
+</head>
+<body>
+<main>
+  <h1>Career Engine</h1>
+  <p>J0 · Local container foundation. Business features and review workflow arrive in later milestones.</p>
+  <div id="state" role="status">Checking API and persistence…</div>
+  <p class="note">No personal data, external ATS request or real submission is performed.</p>
+</main>
+<script>
+  fetch('/api/system/status', {cache: 'no-store'})
+    .then((response) => {if(!response.ok) throw Error('HTTP ' + response.status); return response.json();})
+    .then((status) => {
+      document.getElementById('state').textContent =
+        'API ' + status.version + ' · ' + status.database + ' OK · Marker: ' + (status.marker ?? 'none');
+    })
+    .catch(() => { document.getElementById('state').textContent = 'API unavailable'; });
+</script>
+</body>
+</html>

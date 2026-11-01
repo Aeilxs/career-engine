@@ -1,0 +1,26 @@
+name: career-engine
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    init: true
+    # UID/GID is initialized by scripts/init-local.sh for bind-mount portability.
+    user: "${CAREER_UID:-10001}:${CAREER_GID:-10001}"
+    environment:
+      CAREER_DATA_DIR: /data
+    volumes:
+      - ./data:/data
+    ports:
+      - "127.0.0.1:8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-m", "career_engine.healthcheck"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL

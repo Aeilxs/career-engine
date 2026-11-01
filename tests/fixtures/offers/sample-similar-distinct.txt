@@ -1,0 +1,9 @@
+Title: Business Manager — Industrial Energy
+Company: Example Industrial Solutions (synthetic)
+Location: Marseille, France
+Contract: Permanent
+Salary: Not disclosed
+Source ID: synthetic/board/offer-002
+Description:
+A separate position at the same employer, with the same title, requires a different manager and client portfolio.
+Application URL: https://example.org/jobs/offer-002

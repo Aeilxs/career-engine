@@ -1,0 +1,37 @@
+# Python and analysis
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local secrets, cookies and project state
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+data/*
+!data/.gitkeep
+artifacts/
+*.db
+*.db-shm
+*.db-wal
+*.sqlite*
+
+# Sanitized Markdown run reports may be committed; raw traces, screenshots and logs are local
+reports/**/*.log
+reports/**/*.har
+reports/**/*.zip
+reports/**/*.png
+reports/**/*.jpg
+reports/**/*.webm
+reports/**/*.mp4
+
+# Workstations and editors
+.DS_Store
+.idea/
+.vscode/
