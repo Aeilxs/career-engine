@@ -35,3 +35,6 @@ reports/**/*.mp4
 .DS_Store
 .idea/
 .vscode/
+
+# Raw E2E artifacts (screenshots, downloaded XLSX, result JSON) stay local
+reports/artifacts/
