@@ -1,6 +1,6 @@
 # TASK-J1-001 — Manual Posting → Application Tracker → XLSX
 
-**State:** TODO. **Prerequisites:** P0/J0 accepted; maintainer reviews React/Vite/TypeScript and XLSX dependencies/lock/build changes as a separate prerequisite. **REQ:** 001–005, 016–018, 023, 025. **Tests:** T01–T04, T14–T16, T21.
+**State:** IMPLEMENTED BY AGENT, NOT ACCEPTED (see `reports/J1-2026-11-01.md` for evidence and deviations; React/Vite/TypeScript and a third-party XLSX library were not introduced because they need a separate maintainer-reviewed prerequisite). **Prerequisites:** P0/J0 accepted; maintainer reviews React/Vite/TypeScript and XLSX dependencies/lock/build changes as a separate prerequisite. **REQ:** 001–005, 016–018, 023, 025. **Tests:** T01–T04, T14–T16, T21.
 
 ## Scope
 

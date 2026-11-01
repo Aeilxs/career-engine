@@ -1,6 +1,6 @@
 # Career Engine
 
-**Status:** J0 implementation prepared; runtime approval on the maintainer's Mac is pending. This repository is not a completed job-application system.
+**Status:** J0 runtime approval is pending; J1 (manual import → tracker → XLSX) is implemented and awaiting maintainer review. This repository is not a completed job-application system and cannot submit applications.
 
 Career Engine is a **local-first, single-user job discovery, preparation, review, and tracking application**. Each milestone provides a usable vertical slice and a repeatable end-to-end (E2E) proof. Automated submission is deferred until the local ATS simulator, approval, and lost-acknowledgment safety gates pass.
 
@@ -62,7 +62,21 @@ uv run --frozen career doctor
 uv run --frozen career --version
 ```
 
-Set `CAREER_DATA_DIR` to a temporary location if you do not want development work to touch `./data`. `career marker` is only a J0 persistence probe, **not** an application-domain feature. The current `/` UI is static; a React implementation belongs to J1 after frontend dependencies are reviewed.
+Set `CAREER_DATA_DIR` to a temporary location if you do not want development work to touch `./data`. `career marker` is only a J0 persistence probe, **not** an application-domain feature. The `/` UI is a dependency-free page (import, offers, tracker, XLSX download); a React/Vite implementation still requires a maintainer-reviewed dependency prerequisite.
+
+J1 from the command line (same use cases as the UI):
+
+```bash
+export CAREER_DATA_DIR=$(mktemp -d)
+uv run --frozen career ingest --file tests/fixtures/offers/sample-business-manager.txt
+uv run --frozen career offers list
+uv run --frozen career application create --offer <OFFER_ID>
+uv run --frozen career application transition <APPLICATION_ID> --to PREPARING --reason "start" --expected-version 1
+uv run --frozen career export --format xlsx --output applications.xlsx
+uv run --frozen career verify
+```
+
+Browser E2E (opt-in, offline): `uv run --frozen --with playwright --with openpyxl python tests/e2e/j1_browser_e2e.py [--mode docker]`. See [`docs/quality/e2e-runs.md`](docs/quality/e2e-runs.md).
 
 ## Git start
 
