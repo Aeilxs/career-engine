@@ -68,6 +68,11 @@ def test_ten_identical_imports_yield_one_offer_one_revision(data_dir: Path) -> N
 
 def test_identical_content_keeps_distinct_source_acquisitions(data_dir: Path) -> None:
     raw = fixture_bytes("sample-business-manager.txt")
+    assert [
+        count(data_dir, table)
+        for table in ("offer", "offer_revision", "source_snapshot", "source_acquisition")
+    ] == [0, 0, 0, 0]
+    assert object_files(data_dir) == []
     first = import_posting(
         data_dir,
         raw,
