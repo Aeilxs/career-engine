@@ -1,7 +1,7 @@
 # J1 Stabilization Verification — 2026-11-02
 
-**Status:** verification observed; maintainer acceptance remains pending.  
-**Tested commit:** `4e4816c5ca6227715cd7642fe5b761e0a0e5546a`  
+**Status:** verification observed; maintainer acceptance remains pending.
+**Tested commit:** `4e4816c5ca6227715cd7642fe5b761e0a0e5546a`
 **Branch:** `copilot/fix-j1-sqlite-initialization`
 
 ## Runtime
