@@ -1,4 +1,4 @@
-# Canonical T01–T25 Test Matrix
+# Canonical T01–T29 Test Matrix
 
 Reference IDs preserve the original v0.1 validation catalog. **These are tests to implement and execute, not tests already passed.** See [requirements](../spec/requirements.md).
 
@@ -35,3 +35,14 @@ Reference IDs preserve the original v0.1 validation catalog. **These are tests t
 Test the real database and file system under `tmp_path`, avoid mocking the properties under examination. Use local HTTP and synthetic fixtures for connector tests. Recorded LLM outputs are deterministic replay inputs; they are not proof of live model quality. For PDF, verify both document content and human visual output; binary identical PDFs require an intentionally normalized build.
 
 CI must not silently skip a failing test. The commit/PR evidence identifies which Txx was run and where the output can be reproduced.
+
+## ADR-015 additional validation scenarios (J2/J3)
+
+| Test | Observable assertion | Milestone / level |
+|---|---|---|
+| T26 | A URL-only manual text input returns a URL-specific validation error and creates **zero** SQL rows/files; a normal job description containing a URL remains valid | J2, API/CLI/UI integration |
+| T27 | Nullable typed projection correctly distinguishes explicit `false`/`0` from `null`, rejects unexpected attributes, unsupported values and out-of-range numbers | J2, contract + fixtures |
+| T28 | Optional populated fields have verifiable snapshot evidence; fabricated citations and mismatched hashes are rejected; distinct source identities retain independent provenance even for identical bytes | J2, integrity + integration |
+| T29 | Extraction versions and full sources survive restart; re-extraction does not overwrite history; analysis obtains original full posting rather than a prior LLM summary | J2/J3, integration + offline spy/mocked provider |
+
+These are **planned** validations, not historical pass results. Preserve T01–T25 and their original meanings.

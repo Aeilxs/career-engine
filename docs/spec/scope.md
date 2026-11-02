@@ -29,3 +29,7 @@ One active candidate, one local worker and one active browser; design test envel
 ## Human contribution
 
 Keep modules small enough for manual reading in Neovim, PRs focused and acceptance visible through UI. Dashboard must make missing information, changes and blocked actions apparent. A model-produced score does not predict hiring probability. Editing a PDF externally creates a new imported artifact/revision; no approved document is overwritten silently.
+
+## Deliberately limited structured representation (ADR-015)
+
+The structured offer record is a concise **filtering and tracking view**, not an exhaustive knowledge graph. Beyond existing canonical fields, the only approved optional projections are remote policy, remote days/week, company car, travel required, travel percentage and minimum experience years. All other claims (for example average employee age or novel benefits) remain in the source posting unless a later human-approved requirement gives them a product use case. A later LLM stage reads the faithful full source, not a prior model's interpretation; absence of a field never implies a negative value.

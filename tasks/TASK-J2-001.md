@@ -4,6 +4,9 @@
 
 ## Scope
 
+Follow ADR-015: retain exact raw source bytes and a faithful full-text view for later direct-to-source analyses. Metadata-only views are projections, never substitutes for the original. A separate ticket, `TASK-J2-002.md`, owns the limited typed metadata contract and URL-only manual-import guard; coordinate migrations without modifying that ticket's acceptance criteria.
+
+
 Select one relevant ATS/job board backed by P1, implement a **read-only** source adapter with configured board/identifier, raw snapshots, typed errors, incremental scanning and visible digest. Prefer official read endpoints when available; never assume read API implies candidate submission permission.
 
 ## E2E
