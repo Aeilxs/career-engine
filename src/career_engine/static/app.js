@@ -230,8 +230,11 @@ function renderOfferDetail(offer) {
   panel.append(el('h3', {text: 'Revisions'}));
   const revisionList = el('ul', {id: 'revision-list'});
   for (const revision of offer.revisions) {
+    const acquisitions = revision.acquisitions.map(acquisition =>
+      `${acquisition.retrieved_at} · ${acquisition.source_ref} · ${acquisition.provider}/${acquisition.board}/${acquisition.source_id}`,
+    ).join(' | ');
     revisionList.append(el('li', {'data-revision': String(revision.revision_number)},
-      el('span', {text: 'R' + revision.revision_number + ' · ' + revision.snapshot.retrieved_at + ' · ' + revision.snapshot.source_ref + ' · '}),
+      el('span', {text: 'R' + revision.revision_number + ' · ' + acquisitions + ' · '}),
       el('span', {className: 'hash', text: revision.snapshot.content_sha256}),
       document.createTextNode(' '),
       el('button', {type: 'button', className: 'view-source', text: 'View source', onclick: () => viewSource(revision.snapshot.id)})));
