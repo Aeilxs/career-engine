@@ -159,10 +159,19 @@ JOIN offer o ON o.id = r.offer_id
 JOIN source_snapshot s ON s.id = r.snapshot_id;
 """
 
+# An acquisition must reference the same snapshot as the revision it supports.
+_MIGRATION_4_ACQUISITION_CONSISTENCY = """
+CREATE TRIGGER source_acquisition_snapshot_matches_revision BEFORE INSERT ON source_acquisition
+WHEN NEW.snapshot_id IS NOT
+    (SELECT snapshot_id FROM offer_revision WHERE id = NEW.offer_revision_id)
+BEGIN SELECT RAISE(ABORT, 'source_acquisition snapshot must match its revision snapshot'); END;
+"""
+
 MIGRATIONS: dict[int, str] = {
     1: _MIGRATION_1_BOOTSTRAP,
     2: _MIGRATION_2_J1,
     3: _MIGRATION_3_ACQUISITIONS,
+    4: _MIGRATION_4_ACQUISITION_CONSISTENCY,
 }
 SCHEMA_VERSION = max(MIGRATIONS)
 _SQLITE_BUSY_TIMEOUT_SECONDS = 5.0

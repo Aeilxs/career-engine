@@ -354,6 +354,8 @@ def get_offer(data_dir: Path, offer_id: str) -> dict[str, Any]:
                 "acquisitions": acquisitions_by_revision[str(row["id"])],
                 "snapshot": {
                     "id": row["snapshot_id"],
+                    # Legacy attributes: first stored source only. `acquisitions` is authoritative.
+                    "provenance_scope": "first_stored_source",
                     "source_ref": row["source_ref"],
                     "retrieved_at": row["retrieved_at"],
                     "mime": row["mime"],

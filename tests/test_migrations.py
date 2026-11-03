@@ -203,3 +203,37 @@ def test_evidence_tables_are_immutable(tmp_path: Path, statement: str) -> None:
             )
         with pytest.raises(sqlite3.IntegrityError, match="immutable"):
             connection.execute(statement)
+
+
+def test_acquisition_snapshot_must_match_revision_snapshot(tmp_path: Path) -> None:
+    path = tmp_path / "career.db"
+    initialize(path)
+    with closing(connect(path)) as connection:
+        for name in ("one", "two"):
+            connection.execute(
+                "INSERT INTO source_snapshot (id, source_ref, retrieved_at, mime, content_sha256, "
+                "size_bytes, connector_version, object_ref) "
+                "VALUES (?, ?, 'now', 'text/plain', ?, 1, 'v', ?)",
+                (name, name, ("a" if name == "one" else "b") * 64, f"objects/{name}"),
+            )
+        connection.execute(
+            "INSERT INTO offer (id, provider, board, external_id, identity_kind, created_at) "
+            "VALUES ('offer', 'p', 'b', 'e', 'native', 'now')"
+        )
+        connection.execute(
+            "INSERT INTO offer_revision (id, offer_id, revision_number, snapshot_id, "
+            "provenance_json, normalized_sha256, created_at) "
+            "VALUES ('revision', 'offer', 1, 'one', '{}', ?, 'now')",
+            ("c" * 64,),
+        )
+        insert = (
+            "INSERT INTO source_acquisition (id, snapshot_id, offer_revision_id, source_ref, "
+            "source_id, provider, board, retrieved_at) "
+            "VALUES (?, ?, 'revision', 's', 'e', 'p', 'b', 'now')"
+        )
+        with pytest.raises(sqlite3.IntegrityError, match="must match its revision"):
+            connection.execute(insert, ("bad", "two"))
+        connection.execute(insert, ("good", "one"))
+        connection.commit()
+        rows = connection.execute("SELECT id FROM source_acquisition").fetchall()
+    assert [row["id"] for row in rows] == ["good"]
