@@ -1,6 +1,7 @@
 """SQLite persistence: connection policy and explicit, ordered schema migrations."""
 
 import sqlite3
+import time
 from collections.abc import Iterator
 from contextlib import closing, contextmanager
 from pathlib import Path
@@ -133,8 +134,47 @@ CREATE TRIGGER application_event_immutable_delete BEFORE DELETE ON application_e
 BEGIN SELECT RAISE(ABORT, 'application_event rows are immutable'); END;
 """
 
-MIGRATIONS: dict[int, str] = {1: _MIGRATION_1_BOOTSTRAP, 2: _MIGRATION_2_J1}
+_MIGRATION_3_ACQUISITIONS = """
+CREATE TABLE source_acquisition (
+    id TEXT PRIMARY KEY,
+    snapshot_id TEXT NOT NULL REFERENCES source_snapshot(id),
+    offer_revision_id TEXT NOT NULL REFERENCES offer_revision(id),
+    source_ref TEXT NOT NULL,
+    source_id TEXT NOT NULL,
+    provider TEXT NOT NULL,
+    board TEXT NOT NULL,
+    retrieved_at TEXT NOT NULL
+);
+CREATE INDEX source_acquisition_by_revision ON source_acquisition(offer_revision_id);
+CREATE TRIGGER source_acquisition_immutable_update BEFORE UPDATE ON source_acquisition
+BEGIN SELECT RAISE(ABORT, 'source_acquisition rows are immutable'); END;
+CREATE TRIGGER source_acquisition_immutable_delete BEFORE DELETE ON source_acquisition
+BEGIN SELECT RAISE(ABORT, 'source_acquisition rows are immutable'); END;
+INSERT INTO source_acquisition (
+    id, snapshot_id, offer_revision_id, source_ref, source_id, provider, board, retrieved_at
+)
+SELECT r.id, s.id, r.id, s.source_ref, o.external_id, o.provider, o.board, s.retrieved_at
+FROM offer_revision r
+JOIN offer o ON o.id = r.offer_id
+JOIN source_snapshot s ON s.id = r.snapshot_id;
+"""
+
+# An acquisition must reference the same snapshot as the revision it supports.
+_MIGRATION_4_ACQUISITION_CONSISTENCY = """
+CREATE TRIGGER source_acquisition_snapshot_matches_revision BEFORE INSERT ON source_acquisition
+WHEN NEW.snapshot_id IS NOT
+    (SELECT snapshot_id FROM offer_revision WHERE id = NEW.offer_revision_id)
+BEGIN SELECT RAISE(ABORT, 'source_acquisition snapshot must match its revision snapshot'); END;
+"""
+
+MIGRATIONS: dict[int, str] = {
+    1: _MIGRATION_1_BOOTSTRAP,
+    2: _MIGRATION_2_J1,
+    3: _MIGRATION_3_ACQUISITIONS,
+    4: _MIGRATION_4_ACQUISITION_CONSISTENCY,
+}
 SCHEMA_VERSION = max(MIGRATIONS)
+_SQLITE_BUSY_TIMEOUT_SECONDS = 5.0
 
 
 def connect(path: Path | None = None) -> sqlite3.Connection:
@@ -142,10 +182,31 @@ def connect(path: Path | None = None) -> sqlite3.Connection:
     resolved.parent.mkdir(parents=True, exist_ok=True)
     connection = sqlite3.connect(resolved, timeout=5)
     connection.row_factory = sqlite3.Row
-    connection.execute("PRAGMA busy_timeout = 5000")
-    connection.execute("PRAGMA foreign_keys = ON")
-    connection.execute("PRAGMA journal_mode = WAL")
+    try:
+        connection.execute("PRAGMA busy_timeout = 5000")
+        connection.execute("PRAGMA foreign_keys = ON")
+        _enable_wal(connection)
+    except BaseException:
+        connection.close()
+        raise
     return connection
+
+
+def _enable_wal(connection: sqlite3.Connection) -> None:
+    """Enable persistent WAL mode, retrying only transient lock contention."""
+    deadline = time.monotonic() + _SQLITE_BUSY_TIMEOUT_SECONDS
+    delay = 0.01
+    while True:
+        try:
+            connection.execute("PRAGMA journal_mode = WAL")
+            return
+        except sqlite3.OperationalError as error:
+            code = getattr(error, "sqlite_errorcode", None)
+            remaining = deadline - time.monotonic()
+            if code is None or code & 0xFF != sqlite3.SQLITE_BUSY or remaining <= 0:
+                raise
+            time.sleep(min(delay, remaining))
+            delay = min(delay * 2, 0.1)
 
 
 @contextmanager

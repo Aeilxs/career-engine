@@ -59,8 +59,77 @@ def test_ten_identical_imports_yield_one_offer_one_revision(data_dir: Path) -> N
     raw = fixture_bytes("sample-business-manager.txt")
     outcomes = [import_posting(data_dir, raw).outcome for _ in range(10)]
     assert outcomes == ["created"] + ["unchanged"] * 9
-    assert [count(data_dir, t) for t in ("offer", "offer_revision", "source_snapshot")] == [1, 1, 1]
+    assert [
+        count(data_dir, t)
+        for t in ("offer", "offer_revision", "source_snapshot", "source_acquisition")
+    ] == [1, 1, 1, 10]
     assert len(object_files(data_dir)) == 1
+
+
+def test_identical_content_keeps_distinct_source_acquisitions(data_dir: Path) -> None:
+    raw = fixture_bytes("sample-business-manager.txt")
+    assert [
+        count(data_dir, table)
+        for table in ("offer", "offer_revision", "source_snapshot", "source_acquisition")
+    ] == [0, 0, 0, 0]
+    assert object_files(data_dir) == []
+    first = import_posting(
+        data_dir,
+        raw,
+        source_ref="provider-a-capture",
+        source_id="provider-a-123",
+        provider="provider-a",
+        board="board-a",
+    )
+    second = import_posting(
+        data_dir,
+        raw,
+        source_ref="provider-b-capture",
+        source_id="provider-b-456",
+        provider="provider-b",
+        board="board-b",
+    )
+
+    assert first.content_sha256 == second.content_sha256
+    assert first.snapshot_id == second.snapshot_id
+    assert first.offer_id != second.offer_id
+    assert (count(data_dir, "offer"), count(data_dir, "offer_revision")) == (2, 2)
+    assert (count(data_dir, "source_snapshot"), count(data_dir, "source_acquisition")) == (1, 2)
+    assert len(object_files(data_dir)) == 1
+    first_acquisition = get_offer(data_dir, first.offer_id)["revisions"][0]["acquisitions"]
+    second_acquisition = get_offer(data_dir, second.offer_id)["revisions"][0]["acquisitions"]
+    assert len(first_acquisition) == len(second_acquisition) == 1
+    assert {
+        "source_ref": first_acquisition[0]["source_ref"],
+        "source_id": first_acquisition[0]["source_id"],
+        "provider": first_acquisition[0]["provider"],
+        "board": first_acquisition[0]["board"],
+    } == {
+        "source_ref": "provider-a-capture",
+        "source_id": "provider-a-123",
+        "provider": "provider-a",
+        "board": "board-a",
+    }
+    assert {
+        "source_ref": second_acquisition[0]["source_ref"],
+        "source_id": second_acquisition[0]["source_id"],
+        "provider": second_acquisition[0]["provider"],
+        "board": second_acquisition[0]["board"],
+    } == {
+        "source_ref": "provider-b-capture",
+        "source_id": "provider-b-456",
+        "provider": "provider-b",
+        "board": "board-b",
+    }
+    assert first_acquisition[0]["retrieved_at"] and second_acquisition[0]["retrieved_at"]
+    first_snapshot = get_offer(data_dir, first.offer_id)["revisions"][0]["snapshot"]
+    second_snapshot = get_offer(data_dir, second.offer_id)["revisions"][0]["snapshot"]
+    assert first_snapshot == second_snapshot
+    assert first_snapshot["provenance_scope"] == "first_stored_source"
+    assert first_snapshot["source_ref"] == "provider-a-capture"
+    assert first_snapshot["retrieved_at"] == first_acquisition[0]["retrieved_at"]
+    assert second_acquisition[0]["source_ref"] == "provider-b-capture"
+    assert second_acquisition[0]["source_ref"] != second_snapshot["source_ref"]
 
 
 def test_changed_source_creates_r2_and_leaves_r1_intact(data_dir: Path) -> None:

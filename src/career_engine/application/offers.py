@@ -104,6 +104,16 @@ def import_posting(
                     (offer["current_revision_id"], digest),
                 ).fetchone()
                 if current is not None:
+                    _record_acquisition(
+                        connection,
+                        snapshot_id=str(current["snapshot_id"]),
+                        revision_id=str(current["id"]),
+                        source_ref=label,
+                        source_id=identity.external_id,
+                        provider=identity.provider,
+                        board=identity.board,
+                        retrieved_at=now,
+                    )
                     return ImportResult(
                         "unchanged",
                         offer_id,
@@ -167,6 +177,16 @@ def import_posting(
                     now,
                 ),
             )
+            _record_acquisition(
+                connection,
+                snapshot_id=snapshot_id,
+                revision_id=revision_id,
+                source_ref=label,
+                source_id=identity.external_id,
+                provider=identity.provider,
+                board=identity.board,
+                retrieved_at=now,
+            )
             canonical = canonicalize_url(normalized.apply_url) if normalized.apply_url else None
             connection.execute(
                 "UPDATE offer SET current_revision_id = ?, "
@@ -185,6 +205,33 @@ def import_posting(
         object_ref,
         _identity_dict(identity),
         suggestions,
+    )
+
+
+def _record_acquisition(
+    connection: sqlite3.Connection,
+    *,
+    snapshot_id: str,
+    revision_id: str,
+    source_ref: str,
+    source_id: str,
+    provider: str,
+    board: str,
+    retrieved_at: str,
+) -> None:
+    connection.execute(
+        "INSERT INTO source_acquisition (id, snapshot_id, offer_revision_id, source_ref, "
+        "source_id, provider, board, retrieved_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        (
+            str(uuid.uuid4()),
+            snapshot_id,
+            revision_id,
+            source_ref,
+            source_id,
+            provider,
+            board,
+            retrieved_at,
+        ),
     )
 
 
@@ -275,6 +322,17 @@ def get_offer(data_dir: Path, offer_id: str) -> dict[str, Any]:
             "SELECT id, stage FROM application WHERE offer_id = ?", (offer_id,)
         ).fetchone()
         suggestions = _suggestions(connection, offer_id)
+        acquisitions_by_revision = {
+            str(row["id"]): [
+                dict(acquisition)
+                for acquisition in connection.execute(
+                    "SELECT id, snapshot_id, source_ref, source_id, provider, board, retrieved_at "
+                    "FROM source_acquisition WHERE offer_revision_id = ? ORDER BY retrieved_at, id",
+                    (row["id"],),
+                ).fetchall()
+            ]
+            for row in revisions
+        }
     revision_items = []
     for row in revisions:
         revision_items.append(
@@ -293,8 +351,11 @@ def get_offer(data_dir: Path, offer_id: str) -> dict[str, Any]:
                     "apply_url": row["apply_url"],
                 },
                 "provenance": json.loads(row["provenance_json"]),
+                "acquisitions": acquisitions_by_revision[str(row["id"])],
                 "snapshot": {
                     "id": row["snapshot_id"],
+                    # Legacy attributes: first stored source only. `acquisitions` is authoritative.
+                    "provenance_scope": "first_stored_source",
                     "source_ref": row["source_ref"],
                     "retrieved_at": row["retrieved_at"],
                     "mime": row["mime"],
