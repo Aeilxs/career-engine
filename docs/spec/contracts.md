@@ -82,3 +82,11 @@ Stable columns: application_id, offer_id, company, position, location, URL, impo
 ## Human review contract
 
 Edits produce new revisions with parent and diff. Edits to facts belong to the profile, not merely a generated PDF. Review UI displays target, source facts, changed fields, generated artifacts, answers, unknown required questions and precise approval hash. Conditional questions discovered later return the package to review.
+
+## Source-first typed metadata projection (ADR-015; J2/J3)
+
+The canonical full job posting remains the immutable source (original bytes plus faithful, versioned full-text rendering when necessary). A projected metadata document is **not** a replacement for the posting and must never become the sole prompt input for a downstream analysis LLM.
+
+Fixed optional attributes (no arbitrary keys): `remote_policy` (`onsite`, `hybrid`, `remote` or null), `remote_days_per_week` (integer 0–7 or null), `company_car` (boolean or null), `travel_required` (boolean or null), `travel_percentage` (number 0–100 or null), `minimum_experience_years` (non-negative number or null). Existing offer core fields remain as they are and retain their provenance. These six optional fields are candidate-facing conveniences, not a full semantic representation of the job posting.
+
+Each non-null optional field must have verifiable evidence from an immutable snapshot, including the exact referenced source identity and an excerpt/path/offset where feasible. `false` and `0` require explicit support; missing, ambiguous and contradictory inputs remain `null`. An extraction run records its source revision, method/version, validator and results; changed extractor version does not overwrite historical records. See `tasks/TASK-J2-002.md` for executable acceptance and migration requirements. The future J3 LLM adapter must use the same fixed, validated output contract; its analysis prompts read the full posting directly.

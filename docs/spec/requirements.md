@@ -53,3 +53,7 @@ Legend: `M` mandatory for the stated milestone, `S` optional/deferred. `Txx` lin
 - Old phases A/B/C/D are replaced by J0–J7; do not follow old task ordering blindly. Full URL ingestion in REQ-001 completes at J2 (manual file import at J1); durable background jobs in REQ-018 enter at J2 when long-running scans appear.
 - The original proposed CLI-first + HTMX UI is superseded by a Web-first React/Vite frontend (introduced at J1), while the CLI remains an operational path to the **same** business services.
 - An old RPO/RTO and 24-hour backup target is not applicable to the accepted no-backup experiment. Data durability across *container recreation* remains mandatory.
+
+## ADR-015 interpretation for J2 and later
+
+REQ-001/002 now explicitly require a **source-first** limited projection: raw sources remain authoritative, optional fields are fixed and nullable, and URL-only manual text input fails with no stored `unknown` offer. REQ-019 (J3 LLM audit logging) remains a separate gate; this decision does **not** move paid LLM integration into J2. Additional regression scenarios are T26–T29. This paragraph refines the stated requirements and does not renumber REQ-001–REQ-027.

@@ -46,3 +46,7 @@ Input: one personally chosen, genuinely interesting live opportunity on an ATS v
 ## Regression contract
 
 At each Jx run, rerun the accepted previous J0–J(x−1) offline E2E suite. A new feature must not make an earlier milestone's UI flow fail. Do not alter historical fixtures merely to suppress a regression; version a new fixture with rationale.
+
+### J2 additional acceptance — `source-metadata-contract` (ADR-015)
+
+This is a **separate, offline J2 run**, required in addition to `source-scan-to-digest` once TASK-J2-002 is implemented. From an isolated J1 v2 SQLite database, ingest a fixture with explicit remote/car/travel values, one with these values absent, and one with irrelevant extra company facts. Show the fixed nullable projection and direct access to the exact full source. Supply a URL-only string to manual text import and prove that no source/object/offer/revision rows were inserted. Attempt unsupported JSON keys and forged quotes and verify validation failures. Re-extract with same vs new extractor version and compare persisted historical results after process restart. Assert that source identity/provenance is not lost if different providers share byte-identical descriptions. J3 adds a spy test proving the full posting (not a prior model summary) is passed to the analysis boundary.

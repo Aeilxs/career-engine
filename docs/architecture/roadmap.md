@@ -7,7 +7,7 @@
 | P0/J0 | Verified Python 3.14, locked deps, one-container runtime, API + UI, SQLite survives container recreation | TASK-BOOT-001 | `boot-and-restart` |
 | P1 | Classify 30 target postings by provider, inspect accessibility and coverage | TASK-P1-001 | `source-coverage-audit` |
 | J1 | Manual offer import, immutable revisions, separate application, tracker UI, XLSX | TASK-J1-001 | `manual-ingest-to-xlsx` |
-| J2 | Configured read-only source scan, incremental digest, errors and restart | TASK-J2-001 | `source-scan-to-digest` |
+| J2 | Configured read-only source scan + source-first typed metadata/URL guard, incremental digest, errors and restart | TASK-J2-001 + TASK-J2-002 | `source-scan-to-digest` + `source-metadata-contract` |
 | J3 | Approved profile facts, explainable matching, measured LLM budgets | TASK-J3-001 | `offer-to-shortlist` |
 | J4 | Editable CV + PDF, versioned package, human diff/review/approval | TASK-J4-001 | `shortlist-to-approved-package` |
 | J5 | Mock ATS inspection/conditional fields/uploads and safe fill only | TASK-J5-001 | `approved-package-to-filled-form` |

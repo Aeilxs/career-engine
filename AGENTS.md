@@ -47,3 +47,7 @@ If a feature needs a new dependency (including React/Vite/TypeScript), propose t
 ## Language
 
 Write instructions, source, docstrings, tickets, tests, commit titles and product UI copy in **English** unless a specific localization ticket says otherwise. Do not introduce bilingual duplicate specs.
+
+## Source-first data contract (ADR-015)
+
+Read `docs/decisions/ADR-015-source-first-limited-metadata.md` before working on J2/J3 ingestion, extraction or analysis. The raw posting is authoritative; the fixed nullable metadata projection is for UI/filters/tracking. Do not generate a dynamic ontology, interpret missing data as false, or feed a previous LLM summary as the sole context to another LLM. Reject URL-only manual text imports with no persistence, and validate evidence before recording extracted fields. `TASK-J2-001` and `TASK-J2-002` are separate assignments. No paid-provider integration before the J3 dependency/budget gate.
