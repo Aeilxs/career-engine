@@ -6,7 +6,8 @@ These are **proposed stable conceptual contracts**. Pydantic models, DB migratio
 
 | Entity | Essential fields | Hard constraints |
 |---|---|---|
-| `SourceSnapshot` | id, source_ref, retrieved_at, mime, http_status/error_code, content_sha256, connector_version, object_ref | Immutable bytes and outcome; failed collections remain traceable |
+| `SourceSnapshot` | id, source_ref, retrieved_at, mime, http_status/error_code, content_sha256, connector_version, object_ref | Immutable, content-addressed bytes; identical content can share storage |
+| `SourceAcquisition` | id, snapshot_id, offer_revision_id, source_ref, source_id, provider, board, retrieved_at | Immutable record per retrieval; content deduplication never merges source identity or offers; `snapshot_id` must equal the revision's snapshot (DB trigger); `SourceSnapshot.source_ref`/`retrieved_at` describe only the first stored source, acquisitions are authoritative |
 | `Offer` | id, provider, board, external_id, canonical_url, current_revision_id | Native source identity preferred; a content hash is not a universal offer ID |
 | `OfferRevision` | id, offer_id, snapshot_id, title, company, locations, contract, salary, description, apply_url, provenance | Immutable; missing data is unknown; updated content creates a new revision |
 | `Salary` | min, max, currency, period, compensation_kind, gross_net, raw_text | Decimal; min ≤ max; fixed/variable/total and gross/net not guessed |

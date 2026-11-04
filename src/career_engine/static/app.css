@@ -1,0 +1,183 @@
+:root {
+    color-scheme: dark;
+    font-family: system-ui, -apple-system, sans-serif;
+    background: #1e1e2e;
+    color: #cdd6f4
+}
+
+body {
+    margin: 0;
+    padding: 18px;
+    box-sizing: border-box
+}
+
+header,
+main {
+    max-width: 1100px;
+    margin: 0 auto
+}
+
+h1 {
+    margin: 0 0 4px;
+    color: #b4befe
+}
+
+h2 {
+    color: #b4befe;
+    margin-top: 20px
+}
+
+h3 {
+    color: #cba6f7
+}
+
+nav {
+    display: flex;
+    gap: 8px;
+    margin: 12px 0
+}
+
+button {
+    font: inherit;
+    background: #45475a;
+    color: #cdd6f4;
+    border: 1px solid #585b70;
+    border-radius: 8px;
+    padding: 6px 14px;
+    cursor: pointer
+}
+
+button.primary {
+    background: #89b4fa;
+    color: #11111b;
+    border-color: #89b4fa;
+    margin-top: 12px
+}
+
+button.tab[aria-current="true"] {
+    background: #b4befe;
+    color: #11111b
+}
+
+label {
+    display: block;
+    margin-top: 12px;
+    color: #bac2de;
+    font-size: 14px
+}
+
+input[type=text],
+textarea,
+select {
+    width: 100%;
+    box-sizing: border-box;
+    background: #181825;
+    color: #cdd6f4;
+    border: 1px solid #585b70;
+    border-radius: 8px;
+    padding: 8px;
+    font: inherit
+}
+
+textarea {
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 13px
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+    font-size: 14px
+}
+
+th,
+td {
+    text-align: left;
+    padding: 7px 8px;
+    border-bottom: 1px solid #45475a;
+    vertical-align: top;
+    overflow-wrap: anywhere
+}
+
+th {
+    color: #a6adc8;
+    font-weight: 600
+}
+
+.note {
+    font-size: 13px;
+    color: #a6adc8;
+    line-height: 1.5
+}
+
+code {
+    color: #a6e3a1
+}
+
+.message {
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin: 12px 0;
+    background: #313244;
+    border: 1px solid #585b70
+}
+
+.message.error {
+    background: #45262e;
+    border-color: #f38ba8;
+    color: #f5c2cc
+}
+
+.panel {
+    background: #313244;
+    border: 1px solid #45475a;
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 16px
+}
+
+pre {
+    background: #181825;
+    border: 1px solid #45475a;
+    border-radius: 8px;
+    padding: 10px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-size: 12px
+}
+
+.unknown {
+    color: #f9e2af;
+    font-style: italic
+}
+
+.hash {
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 12px;
+    color: #94e2d5
+}
+
+dl {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 4px 14px
+}
+
+dt {
+    color: #a6adc8
+}
+
+dd {
+    margin: 0;
+    overflow-wrap: anywhere
+}
+
+a {
+    color: #89b4fa
+}
+
+td button,
+th {
+    white-space: nowrap
+}

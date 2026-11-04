@@ -12,7 +12,9 @@ Apple Silicon Mac / other local Docker host
   localhost port: 127.0.0.1:8000 -> container port 8000
 ```
 
-**Currently implemented at J0:** GET `/`, GET `/healthz`, GET `/api/system/status`, CLI `career doctor`, `career marker set/get`, persistent SQLite marker table. These are infrastructure probes, *not* application-domain features. The J0 UI is intentionally static HTML; React is a reviewed J1 dependency change.
+**Currently implemented at J0:** GET `/healthz`, GET `/api/system/status`, CLI `career doctor`, `career marker set/get`, persistent SQLite marker table. These are infrastructure probes, *not* application-domain features.
+
+**Implemented at J1 (pending maintainer acceptance):** manual text/file import (`POST /api/imports`, raw bytes in the body), immutable source snapshots in content-addressed object files, offers + immutable revisions with field provenance, fuzzy duplicate *suggestions*, separate applications with hashed manifests, stage transitions with atomic history events and expected-version checks, XLSX export, integrity verification, and a durable SQLite job-claim queue (no job kinds registered yet). CLI: `career ingest`, `offers list|show`, `application create|list|transition`, `export --format xlsx`, `verify`, `worker`. The UI is dependency-free vanilla JS served by FastAPI at `/`; the React/Vite/TypeScript frontend is **not** implemented and still needs a reviewed dependency/build prerequisite.
 
 ## Package boundaries
 

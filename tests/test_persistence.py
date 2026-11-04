@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from career_engine.cli import main
-from career_engine.db import initialize, read_marker, write_marker
+from career_engine.db import SCHEMA_VERSION, initialize, read_marker, write_marker
 
 
 def test_marker_persists_between_connections(tmp_path: Path) -> None:
@@ -15,7 +15,7 @@ def test_marker_persists_between_connections(tmp_path: Path) -> None:
     assert read_marker(path) == "J0-persistent"
     with sqlite3.connect(path) as connection:
         assert connection.execute("PRAGMA journal_mode").fetchone()[0] == "wal"
-        assert connection.execute("PRAGMA user_version").fetchone()[0] == 1
+        assert connection.execute("PRAGMA user_version").fetchone()[0] == SCHEMA_VERSION
 
 
 def test_marker_invalid_value_does_not_mutate(tmp_path: Path) -> None:

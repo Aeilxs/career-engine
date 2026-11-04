@@ -10,3 +10,7 @@ def data_directory() -> Path:
 
 def database_path() -> Path:
     return data_directory() / "career.db"
+
+
+def database_path_for(data_dir: Path) -> Path:
+    return data_dir / "career.db"
